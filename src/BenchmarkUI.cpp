@@ -27,7 +27,7 @@ namespace {
     }
 }
 
-class BenchmarkPopup : public geode::Popup<> {
+class BenchmarkPopup : public geode::Popup {
 private:
     CCLabelBMFont* m_minLabel = nullptr;
     CCLabelBMFont* m_maxLabel = nullptr;
@@ -114,11 +114,12 @@ private:
     }
 
     void history(CCObject*) {
-        if (auto popup = createBenchmarkHistoryPopup()) popup->show();
+        showBenchmarkHistoryPopup();
     }
 
 protected:
-    bool setup() override {
+    bool init() {
+        if (!Popup::init(420.f, 360.f)) return false;
         this->setTitle("GD Benchmark");
         auto win = this->getContentSize();
 
@@ -173,8 +174,6 @@ protected:
         m_levels = label("", 0.36f);
         m_levels->setAnchorPoint({0.f, 1.f});
         m_levels->setPosition({32.f, win.height - 238.f});
-        m_levels->setDimensions({win.width - 64.f, 80.f});
-        m_levels->setAlignment(kCCTextAlignmentLeft);
         this->addChild(m_levels);
 
         auto bottom = CCMenu::create();
@@ -194,8 +193,7 @@ protected:
         return true;
     }
 
-    // Geode's Popup<> helper calls its own close handler, so these are plain
-    // selector callbacks with tiny wrappers.
+    // Selector callbacks used by the popup buttons.
     void minusMin(CCObject*) { adjustMin(-1); }
     void plusMin(CCObject*) { adjustMin(+1); }
     void minusMax(CCObject*) { adjustMax(-1); }
@@ -210,9 +208,10 @@ protected:
     void onHistory(CCObject* sender) { history(sender); }
 };
 
-class BenchmarkHistoryPopup : public geode::Popup<> {
+class BenchmarkHistoryPopup : public geode::Popup {
 protected:
-    bool setup() override {
+    bool init() {
+        if (!Popup::init(420.f, 300.f)) return false;
         this->setTitle("Benchmark History");
         auto win = this->getContentSize();
         auto history = BenchmarkManager::get().loadHistory();
@@ -241,22 +240,22 @@ protected:
     }
 };
 
-BenchmarkPopup* createBenchmarkPopup() {
+void showBenchmarkPopup() {
     auto ret = new BenchmarkPopup();
-    if (ret && ret->initAnchored(420.f, 360.f)) {
+    if (ret && ret->init()) {
         ret->autorelease();
-        return ret;
+        ret->show();
+        return;
     }
     CC_SAFE_DELETE(ret);
-    return nullptr;
 }
 
-BenchmarkHistoryPopup* createBenchmarkHistoryPopup() {
+void showBenchmarkHistoryPopup() {
     auto ret = new BenchmarkHistoryPopup();
-    if (ret && ret->initAnchored(420.f, 300.f)) {
+    if (ret && ret->init()) {
         ret->autorelease();
-        return ret;
+        ret->show();
+        return;
     }
     CC_SAFE_DELETE(ret);
-    return nullptr;
 }

@@ -1,5 +1,6 @@
 #include "BenchmarkManager.hpp"
 #include "BenchmarkUI.hpp"
+#include "BenchmarkUI.hpp"
 
 #include <Geode/binding/CCMenuItemSpriteExtra.hpp>
 #include <Geode/binding/GameLevelManager.hpp>
@@ -486,11 +487,11 @@ BenchmarkResult const* BenchmarkManager::lastResult() const {
 }
 
 void BenchmarkManager::showMainPopup() {
-    if (auto popup = createBenchmarkPopup()) popup->show();
+    showBenchmarkPopup();
 }
 
 void BenchmarkManager::showHistoryPopup() {
-    if (auto popup = createBenchmarkHistoryPopup()) popup->show();
+    showBenchmarkHistoryPopup();
 }
 
 void BenchmarkManager::showNotification(std::string const& text) {

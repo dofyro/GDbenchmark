@@ -5,6 +5,7 @@
 #include <Geode/modify/PlayLayer.hpp>
 #include <Geode/binding/GJGameLevel.hpp>
 #include <Geode/ui/Notification.hpp>
+#include <Geode/loader/Event.hpp>
 
 using namespace geode::prelude;
 
@@ -52,7 +53,9 @@ class $modify(BenchmarkMenuLayer, MenuLayer) {
 };
 
 class $modify(BenchmarkPlayLayer, PlayLayer) {
-    CCLabelBMFont* m_benchmarkHUD = nullptr;
+    struct Fields {
+        CCLabelBMFont* m_benchmarkHUD = nullptr;
+    };
 
     void onEnterTransitionDidFinish() {
         PlayLayer::onEnterTransitionDidFinish();
@@ -60,11 +63,11 @@ class $modify(BenchmarkPlayLayer, PlayLayer) {
         if (!m_level || !mgr.isBenchmarkLevel(m_level->m_levelID.value())) return;
 
         auto size = CCDirector::sharedDirector()->getWinSize();
-        m_benchmarkHUD = CCLabelBMFont::create("BENCHMARK", "bigFont.fnt");
-        m_benchmarkHUD->setScale(0.48f);
-        m_benchmarkHUD->setPosition({size.width / 2.f, size.height - 18.f});
-        m_benchmarkHUD->setZOrder(9999);
-        this->addChild(m_benchmarkHUD, 9999);
+        m_fields->m_benchmarkHUD = CCLabelBMFont::create("BENCHMARK", "bigFont.fnt");
+        m_fields->m_benchmarkHUD->setScale(0.48f);
+        m_fields->m_benchmarkHUD->setPosition({size.width / 2.f, size.height - 18.f});
+        m_fields->m_benchmarkHUD->setZOrder(9999);
+        this->addChild(m_fields->m_benchmarkHUD, 9999);
         mgr.onPlayLayerEntered(this);
     }
 
@@ -82,15 +85,15 @@ class $modify(BenchmarkPlayLayer, PlayLayer) {
         }
 
         float remain = mgr.remainingSeconds();
-        if (m_benchmarkHUD) {
+        if (m_fields->m_benchmarkHUD) {
             int sec = static_cast<int>(std::ceil(remain));
             int mm = sec / 60;
             int ss = sec % 60;
-            m_benchmarkHUD->setString(fmt::format("BENCHMARK  {} / {}   {:02d}:{:02d}",
+            m_fields->m_benchmarkHUD->setString(fmt::format("BENCHMARK  {} / {}   {:02d}:{:02d}",
                 mgr.currentIndex() + 1,
                 mgr.levelCount(),
                 mm, ss).c_str());
-            m_benchmarkHUD->setScale(0.45f);
+            m_fields->m_benchmarkHUD->setScale(0.45f);
         }
 
         if (remain <= 0.f && mgr.state() == BenchmarkManager::State::Playing) {
