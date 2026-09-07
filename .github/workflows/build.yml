@@ -1,0 +1,29 @@
+name: Build GD Benchmark
+
+on:
+  workflow_dispatch:
+  push:
+    branches: ["**"]
+
+jobs:
+  build-windows:
+    name: Build Windows .geode
+    runs-on: windows-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Build Geode mod
+        id: build
+        uses: geode-sdk/build-geode-mod@main
+        with:
+          target: Win64
+          sdk: given
+          build-config: Release
+
+      - name: Upload .geode
+        uses: actions/upload-artifact@v4
+        with:
+          name: GD-Benchmark-Windows
+          path: ${{ steps.build.outputs.build-output }}/*.geode
+          if-no-files-found: error
