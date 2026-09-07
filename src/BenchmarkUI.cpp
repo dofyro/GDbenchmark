@@ -127,8 +127,6 @@ private:
         mgr.start();
         if (mgr.state() != BenchmarkManager::State::Downloading) return;
 
-        // Queue every selected level now. The manager will open the first level as
-        // soon as GD has cached it, then continue with the remaining levels.
         auto const& ids = mgr.selectedIDs();
         for (auto const id : ids) {
             if (auto manager = GameLevelManager::get()) {
@@ -143,7 +141,7 @@ private:
         showBenchmarkHistoryPopup();
     }
 
-protected:
+public:
     bool init() {
         if (!Popup::init(420.f, 320.f)) return false;
         this->setTitle("GD Benchmark");
@@ -257,7 +255,7 @@ protected:
 };
 
 class BenchmarkHistoryPopup : public geode::Popup {
-protected:
+public:
     bool init() {
         if (!Popup::init(420.f, 300.f)) return false;
         this->setTitle("Benchmark History");
