@@ -193,7 +193,17 @@ protected:
         return true;
     }
 
-    // Selector callbacks used by the popup buttons.
+public:
+    static BenchmarkPopup* create() {
+        auto ret = new BenchmarkPopup();
+        if (ret && ret->init()) {
+            ret->autorelease();
+            return ret;
+        }
+        CC_SAFE_DELETE(ret);
+        return nullptr;
+    }
+
     void minusMin(CCObject*) { adjustMin(-1); }
     void plusMin(CCObject*) { adjustMin(+1); }
     void minusMax(CCObject*) { adjustMax(-1); }
@@ -238,24 +248,23 @@ protected:
         this->addChild(note);
         return true;
     }
+
+public:
+    static BenchmarkHistoryPopup* create() {
+        auto ret = new BenchmarkHistoryPopup();
+        if (ret && ret->init()) {
+            ret->autorelease();
+            return ret;
+        }
+        CC_SAFE_DELETE(ret);
+        return nullptr;
+    }
 };
 
 void showBenchmarkPopup() {
-    auto ret = new BenchmarkPopup();
-    if (ret && ret->init()) {
-        ret->autorelease();
-        ret->show();
-        return;
-    }
-    CC_SAFE_DELETE(ret);
+    if (auto popup = BenchmarkPopup::create()) popup->show();
 }
 
 void showBenchmarkHistoryPopup() {
-    auto ret = new BenchmarkHistoryPopup();
-    if (ret && ret->init()) {
-        ret->autorelease();
-        ret->show();
-        return;
-    }
-    CC_SAFE_DELETE(ret);
+    if (auto popup = BenchmarkHistoryPopup::create()) popup->show();
 }
