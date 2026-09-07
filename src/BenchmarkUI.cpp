@@ -47,6 +47,26 @@ private:
         }
     }
 
+    void refreshStatus() {
+        auto& mgr = BenchmarkManager::get();
+        std::string status;
+        if (!mgr.hasDibData()) {
+            status = "Waiting for Demons In Between / GDDL…";
+        } else if (mgr.state() == BenchmarkManager::State::Finished && mgr.lastResult()) {
+            auto r = *mgr.lastResult();
+            status = fmt::format("Last: {:.2f} rating · {:.1f}%", r.rating, r.averagePercent);
+        } else if (mgr.state() == BenchmarkManager::State::Generated) {
+            status = fmt::format("{} levels ready. START opens the first one.", mgr.levelCount());
+        } else if (mgr.state() == BenchmarkManager::State::Downloading) {
+            status = "Loading benchmark levels…";
+        } else if (mgr.state() == BenchmarkManager::State::Playing) {
+            status = "Benchmark in progress…";
+        } else {
+            status = "Set the range, then generate a benchmark.";
+        }
+        m_status->setString(status.c_str());
+    }
+
     void syncConfigFromInputs(CCTextInputNode* changed) {
         if (m_syncingInputs) return;
 
@@ -71,7 +91,7 @@ private:
 
         auto& mgr = BenchmarkManager::get();
         mgr.setConfig(minTier, maxTier, mgr.levelCount(), mgr.minutes(), mgr.unseenOnly());
-        refresh();
+        refreshStatus();
     }
 
     void refresh() {
@@ -85,19 +105,7 @@ private:
         m_countLabel->setString(fmt::format("{}", mgr.levelCount()).c_str());
         m_minutesLabel->setString(fmt::format("{} min", mgr.minutes()).c_str());
         m_unseenLabel->setString(mgr.unseenOnly() ? "UNSEEN: ON" : "UNSEEN: OFF");
-
-        std::string status;
-        if (!mgr.hasDibData()) {
-            status = "Waiting for Demons In Between / GDDL…";
-        } else if (mgr.state() == BenchmarkManager::State::Finished && mgr.lastResult()) {
-            auto r = *mgr.lastResult();
-            status = fmt::format("Last: {:.2f} rating · {:.1f}%", r.rating, r.averagePercent);
-        } else if (mgr.state() == BenchmarkManager::State::Generated) {
-            status = fmt::format("{} levels ready. START opens the first one.", mgr.levelCount());
-        } else {
-            status = "Set the range, then generate a benchmark.";
-        }
-        m_status->setString(status.c_str());
+        refreshStatus();
     }
 
     void adjustCount(int dir) {
@@ -142,7 +150,7 @@ private:
     }
 
 public:
-    bool init() {
+    bool init() override {
         if (!Popup::init(420.f, 320.f)) return false;
         this->setTitle("GD Benchmark");
         auto win = this->getContentSize();
@@ -210,15 +218,15 @@ public:
         m_status->setPosition({win.width / 2.f, win.height - 242.f});
         this->addChild(m_status);
 
-        auto note = label("START loads the selected benchmark one level at a time.\n"
-                          "After the timer ends, the next selected level opens automatically.", 0.33f);
-        note->setAlignment(kCCTextAlignmentCenter);
-        note->setDimensions({win.width - 56.f, 42.f});
-        note->setPosition({win.width / 2.f, 54.f});
-        this->addChild(note);
+        auto note1 = label("START loads the selected benchmark one level at a time.", 0.31f);
+        note1->setPosition({win.width / 2.f, 54.f});
+        this->addChild(note1);
+        auto note2 = label("After the timer, the next selected level opens automatically.", 0.30f);
+        note2->setPosition({win.width / 2.f, 38.f});
+        this->addChild(note2);
 
         auto bottom = CCMenu::create();
-        bottom->setPosition({win.width / 2.f, 22.f});
+        bottom->setPosition({win.width / 2.f, 16.f});
         auto gen = textButton("GENERATE", this, menu_selector(BenchmarkPopup::onGenerate));
         auto start = textButton("START", this, menu_selector(BenchmarkPopup::onStart));
         auto hist = textButton("HISTORY", this, menu_selector(BenchmarkPopup::onHistory));
@@ -256,7 +264,7 @@ public:
 
 class BenchmarkHistoryPopup : public geode::Popup {
 public:
-    bool init() {
+    bool init() override {
         if (!Popup::init(420.f, 300.f)) return false;
         this->setTitle("Benchmark History");
         auto win = this->getContentSize();
