@@ -9,10 +9,10 @@
 
 using namespace geode::prelude;
 
-static EventListener<DemonsInBetweenLoadedEvent> g_dibListener;
+static geode::ListenerHandle g_dibListener;
 
 $on_mod(Loaded) {
-    g_dibListener.bind([](std::map<int, LadderDemon> const& data) {
+    g_dibListener = DemonsInBetweenLoadedEvent().listen([](std::map<int, LadderDemon> const& data) {
         BenchmarkManager::get().setDibData(data);
         log::info("GD Benchmark: received {} DIB/GDDL demons", data.size());
         return ListenerResult::Propagate;
@@ -79,8 +79,6 @@ class $modify(BenchmarkPlayLayer, PlayLayer) {
         if (m_isPracticeMode) {
             mgr.markPracticeUsed();
         } else if (!m_isPaused) {
-            // This is intentionally wall-clock-ish active play time, not level song
-            // time. Paused frames are not counted.
             mgr.update(dt, CCDirector::sharedDirector()->getRunningScene());
         }
 
