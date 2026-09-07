@@ -15,7 +15,7 @@ add_library(${PROJECT_NAME} SHARED ${SOURCES})
 
 target_compile_definitions(${PROJECT_NAME} PRIVATE GD_BENCHMARK_VERSION="0.1.0")
 
-target_include_directories(${PROJECT_NAME} PRIVATE src)
+target_include_directories(${PROJECT_NAME} PRIVATE src include)
 
 if (NOT DEFINED ENV{GEODE_SDK})
     message(FATAL_ERROR "Unable to find Geode SDK! Please define GEODE_SDK environment variable to point to Geode")

@@ -1,7 +1,7 @@
 #pragma once
 
 #include <Geode/Geode.hpp>
-#include <DemonsInBetweenAPI.hpp>
+#include "../include/DemonsInBetweenAPI.hpp"
 #include <map>
 #include <random>
 #include <set>
