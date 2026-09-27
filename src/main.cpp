@@ -26,7 +26,8 @@ class $modify(BenchmarkMenuLayer, MenuLayer) {
         auto winSize = CCDirector::sharedDirector()->getWinSize();
         auto menu = CCMenu::create();
         menu->setID("gd-benchmark-menu");
-        menu->setPosition({winSize.width - 55.f, 35.f});
+        // Keep the control inside the screen and clear of the More Games tile.
+        menu->setPosition({winSize.width - 130.f, 50.f});
 
         auto sprite = CCSprite::createWithSpriteFrameName("GJ_button_06.png");
         sprite->setScale(0.75f);
